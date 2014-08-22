@@ -67,6 +67,7 @@ class cinder::keystone::auth (
   $tenant                = 'services',
   $configure_endpoint    = true,
   $configure_endpoint_v2 = true,
+  $configure_user        = true,
   $service_type          = 'volume',
   $service_type_v2       = 'volumev2',
   $public_address        = '127.0.0.1',
@@ -80,18 +81,21 @@ class cinder::keystone::auth (
   $internal_protocol     = 'http'
 ) {
 
-  Keystone_user_role["${auth_name}@${tenant}"] ~> Service <| name == 'cinder-api' |>
+  if $configure_user {
+    Keystone_user_role["${auth_name}@${tenant}"] ~> Service <| name == 'cinder-api' |>
 
-  keystone_user { $auth_name:
-    ensure   => present,
-    password => $password,
-    email    => $email,
-    tenant   => $tenant,
+    keystone_user { $auth_name:
+      ensure   => present,
+      password => $password,
+      email    => $email,
+      tenant   => $tenant,
+    }
+    keystone_user_role { "${auth_name}@${tenant}":
+      ensure  => present,
+      roles   => 'admin',
+    }
   }
-  keystone_user_role { "${auth_name}@${tenant}":
-    ensure  => present,
-    roles   => 'admin',
-  }
+
   keystone_service { $auth_name:
     ensure      => present,
     type        => $service_type,
