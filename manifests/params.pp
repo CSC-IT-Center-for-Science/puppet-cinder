@@ -27,7 +27,7 @@ class cinder::params {
   } elsif($::osfamily == 'RedHat') {
 
     $package_name              = 'openstack-cinder'
-    $client_package            = 'python-cinderclient'
+    $client_package            = 'python2-cinderclient'
     $api_package               = false
     $api_service               = 'openstack-cinder-api'
     $backup_package            = false
